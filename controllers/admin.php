@@ -179,8 +179,6 @@ class Admin extends Admin_Controller {
                 
                 $id = $this->email_m->insert($insert);
 
-                $this->acuse($id);
-
                 $insert['id']      = $id;
                 $result['data']    = $insert;
                 $result['message'] = lang('email:save_success');
