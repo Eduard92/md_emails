@@ -2,7 +2,7 @@
     'use strict';
 
     angular.module('app')
-    .controller('InputCtrl',['$scope','$http','$rootScope','$sce','$uibModalInstance','users','user',InputCtrl])
+    .controller('InputCtrl',['$scope','$http','$rootScope','$sce','$uibModalInstance','$window','users','user',InputCtrl])
     //.controller('InputSyncron',['$scope','$http','$uibModal','logger',InputSyncron])
     .controller('InputModalDownload',['$scope','$http','$uibModalInstance','logger',InputModalDownload])
     .controller('ModalUserCtrl',['$scope','$http','$uibModalInstance','logger','user',ModalUserCtrl])
@@ -80,8 +80,10 @@
                 $scope.search_users= '';
             });
         }
+
+
     }
-    function InputCtrl($scope,$http,$rootScope,$sce,$uibModalInstance,users,user)
+    function InputCtrl($scope,$http,$rootScope,$sce,$uibModalInstance,$window,users,user)
     {
         $scope.status  = false;
         $scope.message = false;
@@ -126,7 +128,10 @@
                     {
                         if(!user)
                             users.push(result.data);
+
                         ///Agregar nuevo registro a la organizacion visible
+                       download(result.data.id?result.data.id:user.id);
+
                     }
                     
                     $uibModalInstance.close();
@@ -137,6 +142,13 @@
         }
         $scope.valid_form = function () {
             return $scope.frm.$valid;
+        }
+
+        function download (id)
+        {
+            
+          $window.open(SITE_URL+'admin/emails/acuse/?id='+id); 
+
         }
     }
     function ModalOrgCtrl($scope,$http,$uibModalInstance,org_active)
@@ -624,6 +636,7 @@
                       });
 
         }
+
 
     }
 
