@@ -126,12 +126,15 @@
                     }
                     else
                     {
-                        if(!user)
-                            users.push(result.data);
+                       if(!user){
+                            users.push(result.data); ///Agregar nuevo registro a la organizacion visible
+                            
+                            var oficio = prompt("Inserte Numero de Oficio");
 
-                        ///Agregar nuevo registro a la organizacion visible
-                       download(result.data.id?result.data.id:user.id);
-
+                            if (oficio != null) 
+                                    download(result.data.id?result.data.id:user.id,oficio);
+                                
+                       }
                     }
                     
                     $uibModalInstance.close();
@@ -144,12 +147,12 @@
             return $scope.frm.$valid;
         }
 
-        function download (id)
+        function download (id,oficio)
         {
             
-          $window.open(SITE_URL+'admin/emails/acuse/?id='+id); 
+          $window.open(SITE_URL+'admin/emails/acuse/?id='+id+'&oficio='+oficio); 
 
-        }
+        
     }
     function ModalOrgCtrl($scope,$http,$uibModalInstance,org_active)
     {
