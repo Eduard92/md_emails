@@ -949,9 +949,11 @@ class Admin extends Admin_Controller {
     }
 
 
-    public function  acuse($id=0)
+    public function  acuse($id=0,$oficio)
     {
         $id = $id?$id:$this->input->get('id');
+        $oficio = $oficio?$oficio:$this->input->get('oficio');
+
 
         $data = $this->email_m->get($id);
 
@@ -983,7 +985,8 @@ class Admin extends Admin_Controller {
                       'nombre'=>$nombre,
                       'email'=>$email,
                       'anio'=>$anio,
-                      'plantel'=>$plantel
+                      'plantel'=>$plantel,
+		      'oficio'=>$oficio,
                 ),true);
 
         $html2pdf->writeHTML($output);
