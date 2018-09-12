@@ -6,7 +6,7 @@
  * @website		http://ohdoylerules.com/
  * @package 	PyroCMS
  * @subpackage 	Sliders
- * @copyright 	MIT
+ * @copyright 	MIT_
  */
 class Org_m extends MY_Model {
 

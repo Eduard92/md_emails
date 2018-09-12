@@ -6,7 +6,7 @@
  * @website		http://ohdoylerules.com/
  * @package 	PyroCMS
  * @subpackage 	Sliders
- * @copyright 	MIT
+ * @copyright 	MIT_
  */
 class Email_m extends MY_Model {
 
