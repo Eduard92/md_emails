@@ -2,9 +2,19 @@
     <div class="lead text-success"><?=lang('email:orgs_'.$this->method)?></div>
     <?php echo form_open();?>
     <div class="form-group">
+        <label>Nombre</label>
+        <?=form_input('name',$org->name,'class="form-control"')?>
+    </div>
+    <div class="form-group">
         <label>Org path</label>
         <?=form_input('org_path',$org->org_path,'class="form-control" disabled')?>
     </div>
+    
+     <div class="form-group">
+        <label>Plantilla acuse</label>
+        <?=form_dropdown('template',array(''=>'Ninguno')+$templates, $org->template,'class="form-control" ')?>
+    </div>
+    
     <div class="form-group">
         <label>Usuarios</label>
         <div>
@@ -20,7 +30,7 @@
     <div class="divider clearfix"></div>
     <hr />
     <div class="form-actions">
-    <?php $this->load->view('admin/partials/buttons', array('buttons' => array('save', 'cancel') )) ?>
+          <?php $this->load->view('admin/partials/buttons', array('buttons' => array('save', 'cancel') )) ?>
     </div>
     <?php echo form_close();?>
 </section>

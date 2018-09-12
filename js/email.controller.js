@@ -1,23 +1,17 @@
 (function () {
     'use strict';
-
-    angular.module('app')
+    
+    angular.module('app.emails')
     .controller('InputCtrl',['$scope','$http','$rootScope','$sce','$uibModalInstance','$window','users','user',InputCtrl])
     //.controller('InputSyncron',['$scope','$http','$uibModal','logger',InputSyncron])
     .controller('InputModalDownload',['$scope','$http','$uibModalInstance','logger',InputModalDownload])
     .controller('ModalUserCtrl',['$scope','$http','$uibModalInstance','logger','user',ModalUserCtrl])
-    .controller('InputModalStatus',['$scope','$http','$uibModalInstance','$window','logger','recibido',InputModalStatus])
-    .controller('InputModalDetails',['$scope','$http','$uibModalInstance','logger','solicitud',InputModalDetails])
-
-
     
     .controller('ModalOrgCtrl',['$scope','$http','$uibModalInstance','org_active',ModalOrgCtrl])
     .controller('InputModalUpload',['$scope','$http','$uibModalInstance','$cookies','$timeout','logger','Upload', InputModalUpload])
     .controller('IndexCtrl',['$scope','$http','$uibModal',IndexCtrl])
-    .controller('InputConfigCtrl',['$scope','$http',InputConfigCtrl])
     .controller('SolicitudIndexCtrl',['$rootScope','$scope','$http','$uibModal',SolicitudIndexCtrl]);
-
-
+    
     function InputModalDownload($scope,$http,$uibModalInstance,logger)
     {
         $scope.orgs = lista_r;
@@ -80,8 +74,6 @@
                 $scope.search_users= '';
             });
         }
-
-
     }
     function InputCtrl($scope,$http,$rootScope,$sce,$uibModalInstance,$window,users,user)
     {
@@ -89,6 +81,7 @@
         $scope.message = false;
         
         $scope.form = user?user:{};
+        
         /*$scope.search = function(search)
         {
             $scope.dispose = true;
@@ -126,15 +119,14 @@
                     }
                     else
                     {
-                       if(!user){
-                            users.push(result.data); ///Agregar nuevo registro a la organizacion visible
-                            
-                            var oficio = prompt("Inserte Numero de Oficio");
-
-                            if (oficio != null) 
-                                    download(result.data.id?result.data.id:user.id,oficio);
-                                
-                       }
+                        if(!user)
+                            users.push(result.data);
+                        ///Agregar nuevo registro a la organizacion visible
+                        
+                        
+                        download(result.data.id?result.data.id:user.id);
+                        
+                        
                     }
                     
                     $uibModalInstance.close();
@@ -146,13 +138,47 @@
         $scope.valid_form = function () {
             return $scope.frm.$valid;
         }
-
-        function download (id,oficio)
-        {
-            
-          $window.open(SITE_URL+'admin/emails/acuse/?id='+id+'&oficio='+oficio); 
-
         
+        $scope.$watch('form.table_id',function(n,o){
+            
+            if(!n) return false;
+            //'http://localhost:3623/api/ws'+$scope.form.table+'/'+n
+            
+            var  params={
+                headers:{
+                    //'Origin':'http://127.0.0.1:8036/',
+                    //'cache':false,
+                    //'Access-Control-Allow-Origin':'*',
+                    'Authorization':'Basic Y29iYWNhbToxcHNrMjM1NQ==',
+                    //'Access-Control-Headers': 'Content-Type,Authorization',
+                    'Content-Type': 'application/json',
+                   
+                }
+                
+            };
+            //$scope.form.table = 'centros';
+            //n = '40';
+            $http.get('https://rk.cobacam.edu.mx/api/ws'+$scope.form.table+'/'+n+'?type=json',params).then(function(response){
+                
+                var result = response.data;
+                
+                $scope.form.data = JSON.stringify(result);
+            });
+            
+        });
+        
+        function download (id)
+        {
+             var oficio = prompt('Inserte el número de Oficio si desea imprimir el Acuse');
+             
+             if(!oficio)
+             {
+               
+                return false;
+             }
+             $window.open(SITE_URL+'admin/emails/acuse/?id='+id+'&oficio='+oficio); 
+
+        }
     }
     function ModalOrgCtrl($scope,$http,$uibModalInstance,org_active)
     {
@@ -169,16 +195,19 @@
     {
         $scope.users_result = [];
         $scope.action='check';
+        $scope.search_result={
+            //icon:''
+        }
         $scope.cancel = function()
         {
              $uibModalInstance.dismiss("cancel");
         }
         $scope.upload_file = function(file)
         {
-            
+            if(!file) return false;
             $scope.dispose = true;
             
-            if(!file) return false;
+           
             
             file.upload = Upload.upload({
               url: SITE_URL+'admin/emails/upload',
@@ -548,59 +577,6 @@
                       });
        }   
     }
-    function InputConfigCtrl($scope,$http)
-    {
-        $scope.modules    = modules?modules:[];
-        $scope.table = {
-
-
-        };
-
-        $scope.select_index = function(module)
-        {
-            //console.log($scope.modules);
-            //var index = $scope.modules.indexOf({slug:module.slug});
-            //console.log(index);
-
-            $.each($scope.modules,function(index,value){
-
-                if(value.slug == module.slug)
-                {
-                    $scope.index_table = index;
-                    return false;
-                }
-
-            });
-        }
-        $scope.$watch('table',function(newValue,oldValue){
-
-            //console.log(newValue);
-            //console.log(oldValue);
-
-
-            if(!newValue){
-                $scope.rows_left = []
-
-                return false;
-            }
-
-
-            $.each($scope.modules,function(index,value){
-
-                if(newValue.slug == value.slug)
-                {
-                    $scope.index_table = index;
-                    $scope.table       = $scope.modules[index];
-                }
-
-            });
-            $scope.rows_left = newValue?newValue.rows:[];
-        });
-
-
-
-    }
-
     function SolicitudIndexCtrl($rootScope,$scope,$http,$uibModal)
     {
          $scope.recibidos    = recibidos?recibidos:[];
@@ -640,186 +616,6 @@
 
         }
 
-
-    }
-
-    function InputModalStatus($scope,$http,$uibModalInstance,$window,logger,recibido)
-    {
-        $scope.status_1  = false;
-        $scope.message_1 = false;
-        $scope.recibido = recibido?recibido:[];
-
-
-        $scope.form={};
-
-
-        var data_send = {
-                'family_name':$scope.recibido.family_name,
-                'given_name':$scope.recibido.given_name,
-            };
-            //console.log(data_send);
-            
-            $http.post(SITE_URL+'admin/emails/solicitudes/validar',data_send).then(function(response){
-                var result = response.data;
-                   $scope.message_1 = result.message;
-                   $scope.status_1  = result.status;
-
-                        $scope.emails = result.data; 
-                        //$scope.selected = {email: $scope.email};
-                        console.log($scope.emails);
-                        if(result.status = false)
-                        {
-                            alert(result.message);
-                        }   
-                }); 
-                 
-               
-
-        
-        $scope.cancel = function()
-        {
-             $uibModalInstance.dismiss("cancel");
-        }
-
-
-         function download (id)
-        {
-            
-          $window.open(SITE_URL+'admin/emails/acuse/?id='+id); 
-
-        }
-        function validar()
-            {
-                var data_send = {
-                'family_name':$scope.recibido.family_name,
-                //'full_name':$scope.recibido.full_name,
-                'given_name':$scope.recibido.given_name,
-               // 'org_path':$scope.recibido.org_path,
-                 };
-
-            console.log(data_send);
-            
-            $http.post(SITE_URL+'admin/emails/solicitudes/validar',data_send).then(function(response){
-                var result = response.data,
-                    message = result.message;
-
-                    recibido.push(result.data);
-                    
-                    console.log(recibido);                 
-               
-                //$uibModalInstance.close();
-            }); 
-
-            }
-
-        $scope.rechazar = function()
-        {
-            var index =  $scope.recibido.index;
-             var data_send = {
-                'id_solicitud':$scope.recibido.id,
-                 };
-            $http.post(SITE_URL+'admin/emails/solicitudes/rechazar',data_send).then(function(response){
-                var result = response.data;
-                   $scope.message = result.message;
-                   $scope.status  = result.status;
-
-                if(result.status == true)
-                {
-                    var data_push = {
-                        'extra':{'motivo':$scope.recibido.extra.motivo,'matricula':$scope.recibido.extra.matricula,'plantel':$scope.recibido.extra.plantel},
-                        'full_name':$scope.recibido.full_name,
-                        'id':$scope.recibido.id
-                    }
-                    
-                                       
-                     if(rechazados.length>0)
-                     {
-                         rechazados.push(data_push);
-                         console.log(rechazados);
-                         recibidos.splice(index,1);
-                     }
-                     else{
-                        location.reload(); 
-                     }
-                                                 
-                   
-                  $uibModalInstance.close();
-                }
-               
-                
-            }); 
-        }
-        $scope.created = function()
-        {       
-            $scope.status  = false;
-            $scope.message = false;
-
-            var index =  $scope.recibido.index;
-            var data_send = {
-                'email':$scope.recibido.email,
-                'org_path':$scope.recibido.org_path,
-                'given_name':$scope.recibido.given_name,
-                'family_name':$scope.recibido.family_name,
-                'full_name':$scope.recibido.full_name,
-                'module_id':$scope.recibido.module_id,
-                'id_solicitud':$scope.recibido.id,
-                 };
-
-            $http.post(SITE_URL+'admin/emails/solicitudes/created',data_send).then(function(response){
-                var result = response.data;
-                   $scope.message = result.message;
-                   $scope.status  = result.status;
-
-                if(result.status == true)
-                {
-                    var data_push = {
-                        'extra':{'motivo':$scope.recibido.extra.motivo,'matricula':$scope.recibido.extra.matricula,'plantel':$scope.recibido.extra.plantel},
-                        'full_name':$scope.recibido.full_name,
-                        'id':$scope.recibido.id
-                    }
-
-                     download(result.data.email);
-                     if(validados.length>0)
-                     {
-                         validados.push(data_push);
-                         console.log(validados);
-                         recibidos.splice(index,1);
-                     }
-                     else
-                     {
-                        location.reload(); 
-                     }
-                    
-                                       
-                   
-                  $uibModalInstance.close();
-                }
-               
-                
-            }); 
-          console.log(data_send);
-        }
-        
-
-    }
-
-    function InputModalDetails($scope,$http,$uibModalInstance,logger,solicitud)
-    {
-        $scope.status_1  = false;
-        $scope.message_1 = false;
-        $scope.solicitud = solicitud;
-
-
-
-        
-        $scope.cancel = function()
-        {
-             $uibModalInstance.dismiss("cancel");
-        }
-
-       
-
     }
 
 })();
-

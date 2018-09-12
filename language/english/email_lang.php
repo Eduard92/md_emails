@@ -3,7 +3,7 @@ $lang['email:title']		 =	'Correos';
 $lang['email:orgs']		 =	'Organizaciones';
 $lang['email:orgs_edit']		 =	'Modificar organización';
 
-$lang['email:create']		 =	'Nuevo correo';
+$lang['email:create']		 =	'New email';
 $lang['email:syncron']		 =	'Sincronizar';
 $lang['email:csv']		 =	'Subir archivo CSV';
 $lang['email:delete_success']		 =	'Se han eliminado %s correos de manera satisfactoria.';

@@ -112,7 +112,7 @@ background:  #efefef;
                                         <th>Given name</th>
                                         <th>Family name</th>
                                         <th>Full name</th>
-                                        <th width="15%"></th>
+                                        <th width="14%"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -122,15 +122,14 @@ background:  #efefef;
                                         <td>{{user.given_name}}</td>
                                         <td>{{user.family_name}}</td>
                                         <td>{{user.full_name}}</td>
-                                        <td>
+                                        <td class="text-center">
                                             <?php if(group_has_role('emails','delete')) {?>
                                             <a href="<?=base_url('admin/emails/delete/?id={{user.id}}')?>" class="btn btn-danger" confirm-action><i class="fa fa-trash"></i></a>
                                             <?php }?>
                                              <?php if(group_has_role('emails','edit')) {?>
                                             <a href="#" class="btn btn-success" ng-click="edit(user)"><i class="fa fa-pencil"></i></a>
                                             <?php }?>
-                                                <a href="<?=base_url('admin/emails/acuse/?id={{user.id}}')?>" class="btn btn-info"><i class="fa fa-download"></i></a>
-
+                                            
                                             
                                         </td>
                                     </tr>
@@ -272,19 +271,33 @@ background:  #efefef;
                                     
                                     </div>
                                 </div>
-                                <div class="divider">
-                                    <input type="text" class="form-control" ng-model="search_result" />
+                                <div class="divider row" ng-init="search_result.active='1'">
+                                    <div class="col-xs-6"><input type="text" class="form-control" ng-model="search_result.email" /></div>
+                                    <div class="col-xs-6">
+                                        <select ng-model="search_result.icon" class="form-control col-xs-6">
+                                            <option value="">Todos<option>
+                                            <option value="fa-user" ng-if="action=='check'">Duplicados</option>
+                                            <option value="fa-check" ng-if="action=='check'">Encontrados</option>
+                                            <option value="fa-check" ng-if="action=='add'">Correctos</option>
+                                            <option value="fa-ban" ng-if="action=='check'">No encontrado</option>
+                                            <option value="fa-warning" ng-if="action=='add'">Errores</option>
+                                        </select>
+                                    </div>
+                                    <input type="hidden" ng-model="search_result.active" value="1"/>
+                                    
                                 </div>
-                                <div class="extra">Total registros: {{users_result.length}}</div>
+                                <div class="extra">Total registros: {{(users_result|filter:search_result).length}}</div>
                                 <div class="well" data-slim-scroll data-scroll-height="200px">
                                     
                                     <ul class="list-unstyled list-users-li">
-                                        <li ng-repeat="user in users_result | filter:search_result">
-                                        {{user.email}}  <br><span class="text-muted">{{user.full_name}}</span>
+                                        <li ng-repeat="user in users_result | filter:search_result" ng-if="user.active==1">
+                                        <strong>{{$index+1}}.-</strong> {{user.email}}  <br><span class="text-muted">{{user.full_name}}</span>
                                         <span ng-if="user.org_path"> | {{user.org_path}}</span>
                                         
                                         
-                                        <i class="fa fa-check text-success" ng-if="user.status"></i> <i class="fa {{user.icon}} text-danger" ng-if="!user.status" title="{{user.message}}"></i></li>
+                                        <i class="fa fa-check text-success" ng-if="user.status"></i> 
+                                        <i class="fa {{user.icon}} text-danger" ng-if="!user.status" title="{{user.message}}"></i>
+                                        </li>
                                     </ul>
                                 </div>
                                 
@@ -300,7 +313,12 @@ background:  #efefef;
                                 <h4><?php echo lang('email:create') ?> </h4>
         </div>
         <div class="modal-body">
-              <div class="alert" ng-bind-html="message" ng-if="message" ng-class="{'alert-danger':!status,'alert-success':status}"></div>
+            <div class="ui-tab-container ui-tab-horizontal">
+            
+            
+            	<uib-tabset justified="false" class="ui-tab">
+            	        <uib-tab heading="General">
+                            <div class="alert" ng-bind-html="message" ng-if="message" ng-class="{'alert-danger':!status,'alert-success':status}"></div>
                                 
                                 <input type="hidden" ng-model="form.id" value="{{form.id}}"/>
                                 <div class="form-group" >
@@ -367,8 +385,29 @@ background:  #efefef;
                                             <input type="text" class="form-control" ng-disabled="!form.password" ng-model="form.email_altern"/>
                                             <p class="help-block">Envía la contraseña a un correo alterno</p>
                                  </div>
-                      
-                                 
+                            </uib-tab>
+                            <uib-tab heading="Extra">
+                                   <div class="form-group">
+                                        <label>Tabla</label>
+                                        
+                                        <select class="form-control" ng-model="form.table">
+                                              <option value="">Ninguno</option>
+                                              <option value="alumnos">Alumnos</option>
+                                              <option value="empleados">Empleados</option>
+                                        </select>
+                                   </div>
+                                   <div class="form-group">
+                                        <label>Valor</label>
+                                        <input type="text" value="" class="form-control" ng-model="form.table_id"/>
+                                   </div>
+                                   
+                                    <div class="form-group">
+                                        <label>Datos</label>
+                                        <textarea class="form-control" ng-model="form.data"></textarea>
+                                   </div>
+                            </uib-tab>
+                      </uib-tabset>
+                </div>         
          </div>
          <div class="modal-footer">
                                 <button ui-wave type="button" class="btn btn-flat" ng-click="cancel()">Cancelar</button>

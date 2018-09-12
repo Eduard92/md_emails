@@ -15,6 +15,7 @@
     <p style="text-align: right;"><strong>DEPTO. INFORMÁTICA/{{oficio}}/{{anio}}</strong></p>
 
 
+
     <p style="text-align: right;">{{fecha}}</p>
 
 

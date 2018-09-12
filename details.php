@@ -21,9 +21,9 @@
 				
 			),
 			'description' => array(
-				'en' => '.',
+				'en' => 'Administration, registration and cancellation of emails of the COBACAM domain.',
 				
-				'es' => 'Administración, alta  y baja de correos electrónicos del dominio COBACAM',
+				'es' => 'Administración, alta  y baja de correos electrónicos del dominio COBACAM.',
 				
 			),
 			'frontend' => false,
@@ -52,15 +52,14 @@
                             'modal-title' => 'Descargar datos de Google'
         				),*/
         			)
-                ),
+                )
+                /*,
                   'solicitudes'=>array(
                     'name'=>'email:solicitud_title',
                     'uri' => 'admin/emails/solicitudes',
         			
-                )
-
+                )*/
            )
-
 		);
         
         if (function_exists('group_has_role'))
@@ -68,7 +67,7 @@
 			if(group_has_role('emails', 'admin_organizaciones'))
 			{
 			    
-				$info['sections']['fields'] = array(
+				$info['sections']['organizaciones'] = array(
 							'name' 	=> 'email:orgs',
 							'uri' 	=> 'admin/emails/organizaciones',
 							'shortcuts' => array(
@@ -79,12 +78,8 @@
 										)*/
 							)
 				);
-
 			}
-		    
-	
 		}
-
         
         
         return $info;
