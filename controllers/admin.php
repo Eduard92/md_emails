@@ -750,14 +750,13 @@ class Admin extends Admin_Controller {
                             ->get_all();
          }
         
-             
         
          
          $this->input->is_ajax_request()?
             $this->template->build_json($result):            
             $this->template->title($this->module_details['name'])
                    // ->set('orgs_local',$orgs_path)
-                    ->append_metadata('<script type="text/javascript">var  users_local='.json_encode(isset($users_local)?$users_local:array()).',  lista_r='.json_encode($list_orgs).';</script>')
+                    ->append_metadata('<script type="text/javascript">var child_orgs='.json_encode($orgs_path?$orgs_path:null).' ,users_local='.json_encode(isset($users_local)?$users_local:array()).',  lista_r='.json_encode($list_orgs).';</script>')
                      ->append_js('module::email.controller.js')
                     ->build('admin/index');
     }
@@ -1101,5 +1100,93 @@ class Admin extends Admin_Controller {
     }
     
     
+    function export_xls()
+    {
+
+        $orgs_path = $this->input->get('child_orgs')? json_decode($this->input->get('child_orgs')):array();
+
+
+        $base_where = array();
+              
+
+        if(!group_has_role('emails','admin_organizaciones'))
+        {
+            $this->load->library('centros/centro');
+            
+            $orgs_perm = Centro::GetPermissions('orgs');
+
+            $orgs_path_perm = $this->org_m->where_in('id',$orgs_perm)->dropdown('id','org_path');
+
+            $orgs_path_perm = (array) $orgs_path_perm;
+            
+         $emails = $this->email_m->where_in('emails.org_path',$orgs_path_perm)
+                            ->get_all();
+
+        }
+        else
+        {
+             if($orgs_path)
+            {
+                $base_where['org_path'] =  $orgs_path['0'];
+            }
+             $emails = $this->email_m->where($base_where)
+                            ->get_all();
+        }
+       
+
+
+        error_reporting(E_ALL);
+        ini_set('display_errors', TRUE);
+        ini_set('display_startup_errors', TRUE);
+        
+        define('EOL',(PHP_SAPI == 'cli') ? PHP_EOL : '<br />');
+        
+        date_default_timezone_set('America/Mexico_City');
+        
+        
+        $this->load->library('Factory');
+        
+        $this->excel = factory::getTemplate('correos.xlsx');
+        
+        
+        $this->excel->getProperties()->setCreator("Colegio de Bachilleres del Estado de Campeche")
+                             ->setLastModifiedBy("Colegio de Bachilleres del Estado de Campeche")
+                             ->setTitle("Office 2007 XLSX Test Document")
+                             ->setSubject("Office 2007 XLSX Test Document")
+                             ->setDescription("Test document for Office 2007 XLSX, generated using PHP classes.")
+                             ->setKeywords("office 2007 openxml php")
+                             ->setCategory("Test result file");
+                             
+        $inc = 0;
+        $extra = 2;
+        foreach($emails as $email)
+        {
+            
+                $this->excel->getActiveSheet()->insertNewRowBefore($inc+$extra,2);
+                $this->excel->getActiveSheet()->setCellValue('A'.($inc+$extra),$email->email);
+                $this->excel->getActiveSheet()->setCellValue('B'.($inc+$extra), $email->org_path);
+                $this->excel->getActiveSheet()->setCellValue('C'.($inc+$extra), $email->given_name);
+                $this->excel->getActiveSheet()->setCellValue('D'.($inc+$extra), $email->family_name);
+                $this->excel->getActiveSheet()->setCellValue('E'.($inc+$extra), $email->full_name);
+                $inc++;
+        }
+        
+        $this->excel->getActiveSheet()->removeRow(2,1);
+        
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="correos_'.now().'.xlsx"');
+        header('Cache-Control: max-age=0');
+        // If you're serving to IE 9, then the following may be needed
+        header('Cache-Control: max-age=1');
+        
+        // If you're serving to IE over SSL, then the following may be needed
+        header ('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
+        header ('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT'); // always modified
+        header ('Cache-Control: cache, must-revalidate'); // HTTP/1.1
+        header ('Pragma: public'); // HTTP/1.0
+        
+        $objWriter = PHPExcel_IOFactory::createWriter($this->excel, 'Excel2007');
+        $objWriter->save('php://output');
+    }
  }
  ?>

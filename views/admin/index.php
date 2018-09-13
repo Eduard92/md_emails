@@ -72,7 +72,7 @@ background:  #efefef;
             
              
                         <div class="row">
-                              <div class="col-md-7">
+                              <div class="col-md-6">
                             
                                 <?php if(group_has_role('emails','admin_organizaciones')): ?>
                                 <div class="input-group">
@@ -88,10 +88,15 @@ background:  #efefef;
                                 <input type="text" class="form-control" ng-model="filter_search" placeholder="Buscar correo electrónico <?=$this->input->get('org')?>" />
                                 <?php endif;?>
                               </div>
-                              <div class="col-md-5">
+                              <div class="col-md-6">
                                 <?php if(group_has_role('emails','syncronize')) {?>
                                 <button type="button" class="btn" ng-click="open_download()"><i class="fa fa-download"></i> Descargar</button>
                                 <button type="button" class="btn" ng-click="open_upload()"><i class="fa fa-upload"></i> Subir</button>
+                                <?php }?>
+                                <?php if(!group_has_role('emails','admin_organizaciones')) {?>
+                                    <a ng-if="users_local.length > 0" class="btn btn-primary" type="button" class="btn" href="<?=base_url('admin/emails/export_xls')?>" target="_blank" ><i class="fa fa-file-excel-o"></i> Exportar</a>
+                                <?php } else{?>
+                                    <a ng-if="users_local.length > 0" class="btn btn-primary" type="button" class="btn" href="<?=base_url('admin/emails/export_xls/?child_orgs={{child_orgs}}')?>" target="_blank"><i class="fa fa-file-excel-o"></i> Exportar</a>
                                 <?php }?>
                                  <?php if(group_has_role('emails','create')) {?>
                                  <button type="button" class="btn btn-primary" ng-click="create()"><i class="fa fa-plus"></i> Agregar correo</button>

@@ -493,7 +493,8 @@
        $scope.lista_r = lista_r;
        $scope.org_active = '/Alumnos';
        $scope.$watch('org_active',function(n,o){
-           
+                    $scope.child_orgs = child_orgs;
+  
         
        });
        
