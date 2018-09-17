@@ -750,14 +750,14 @@ class Admin extends Admin_Controller {
                             ->get_all();
          }
         
-        
          
          $this->input->is_ajax_request()?
             $this->template->build_json($result):            
             $this->template->title($this->module_details['name'])
                    // ->set('orgs_local',$orgs_path)
-                    ->append_metadata('<script type="text/javascript">var child_orgs='.json_encode($orgs_path?$orgs_path:null).' ,users_local='.json_encode(isset($users_local)?$users_local:array()).',  lista_r='.json_encode($list_orgs).';</script>')
+                    ->append_metadata('<script type="text/javascript">users_local='.json_encode(isset($users_local)?$users_local:array()).',  lista_r='.json_encode($list_orgs).';</script>')
                      ->append_js('module::email.controller.js')
+                    ->set('child_orgs',implode($orgs_path?$orgs_path:null))
                     ->build('admin/index');
     }
     function _append_list($orgs)
@@ -1103,8 +1103,7 @@ class Admin extends Admin_Controller {
     function export_xls()
     {
 
-        $orgs_path = $this->input->get('child_orgs')? json_decode($this->input->get('child_orgs')):array();
-
+        $orgs_path = $this->input->get('child_orgs');
 
         $base_where = array();
               
@@ -1127,7 +1126,7 @@ class Admin extends Admin_Controller {
         {
              if($orgs_path)
             {
-                $base_where['org_path'] =  $orgs_path['0'];
+                $base_where['org_path'] =  $orgs_path;
             }
              $emails = $this->email_m->where($base_where)
                             ->get_all();

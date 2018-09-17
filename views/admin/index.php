@@ -96,7 +96,8 @@ background:  #efefef;
                                 <?php if(!group_has_role('emails','admin_organizaciones')) {?>
                                     <a ng-if="users_local.length > 0" class="btn btn-primary" type="button" class="btn" href="<?=base_url('admin/emails/export_xls')?>" target="_blank" ><i class="fa fa-file-excel-o"></i> Exportar</a>
                                 <?php } else{?>
-                                    <a ng-if="users_local.length > 0" class="btn btn-primary" type="button" class="btn" href="<?=base_url('admin/emails/export_xls/?child_orgs={{child_orgs}}')?>" target="_blank"><i class="fa fa-file-excel-o"></i> Exportar</a>
+                                    <a ng-if="users_local.length > 0" class="btn btn-primary" type="button" class="btn" href="<?=base_url('admin/emails/export_xls?child_orgs='.$child_orgs)?>" target="_blank" ><i class="fa fa-file-excel-o"></i> Exportar</a>
+
                                 <?php }?>
                                  <?php if(group_has_role('emails','create')) {?>
                                  <button type="button" class="btn btn-primary" ng-click="create()"><i class="fa fa-plus"></i> Agregar correo</button>
@@ -140,6 +141,10 @@ background:  #efefef;
                                     </tr>
                                 </tbody>
                             </table>
+                    <div class="row">
+                    
+
+                    </div>
                             
                             <div class="alert alert-info text-center" ng-if="users_local.length==0"><?=lang('global:not_found')?></div>
                           
