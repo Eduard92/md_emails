@@ -757,7 +757,7 @@ class Admin extends Admin_Controller {
                    // ->set('orgs_local',$orgs_path)
                     ->append_metadata('<script type="text/javascript">users_local='.json_encode(isset($users_local)?$users_local:array()).',  lista_r='.json_encode($list_orgs).';</script>')
                      ->append_js('module::email.controller.js')
-                    ->set('child_orgs',implode($orgs_path?$orgs_path:null))
+                    ->set('child_orgs',$orgs_path?implode($orgs_path):null)
                     ->build('admin/index');
     }
     function _append_list($orgs)
@@ -1186,6 +1186,26 @@ class Admin extends Admin_Controller {
         
         $objWriter = PHPExcel_IOFactory::createWriter($this->excel, 'Excel2007');
         $objWriter->save('php://output');
+    }
+
+    function ws()
+    {
+          $curl = curl_init();
+            
+           $client  = base64_encode('cobacam:1psk2355');
+           $header = array(
+              //'Content-Type: application/json',
+             // 'Accept: application/json',
+              //'Content-Type: application/x-www-form-urlencoded',
+              'Authorization: Basic '. $client
+           );
+           curl_setopt($curl, CURLOPT_HEADER, false);  
+           curl_setopt($curl, CURLOPT_HTTPHEADER, $header);  
+           curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
+           curl_setopt($curl, CURLOPT_URL,  'http://cobacam.edu.mx:8075/api/wsalumnos/');
+             $result = json_decode(curl_exec ($curl));
+             print_r($result);
+             curl_close($curl); 
     }
  }
  ?>
